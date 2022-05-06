@@ -33,9 +33,11 @@ const {
 // < 16
 
 function exponencial(exp) {
-
+    //exponente = exp
+ return function(num){
+    return Math.pow(num, exp);
+ }
 }
-
 // ----- Recursión -----
 
 // EJERCICIO 2
@@ -70,7 +72,17 @@ function exponencial(exp) {
 // Aclaraciones: el segundo parametro que recibe la funcion ('direccion') puede ser pasado vacio (null)
 
 function direcciones(laberinto) {
+    let camino = "";
+    for (const prop in laberinto) {
+        if(laberinto[prop]=== "destino"){
+            return camino + prop;
+        }
+        if (typeof laberinto[prop]==="object") {
+            camino += prop + direcciones(laberinto[prop]);
+        }
 
+    }
+    return camino
 }
 
 
@@ -88,7 +100,18 @@ function direcciones(laberinto) {
 // deepEqualArrays([0,1,[[0,1,2],1,2]], [0,1,[[0,1,2],1,2]]) => true
 
 function deepEqualArrays(arr1, arr2) {
-
+    if(arr1.length===arr2.length){
+        for(i=0;i<arr1.length;i++){
+            if(Array.isArray(arr1[i]) && Array.isArray(arr2[i])){
+               return deepEqualArrays(arr1[i],arr2[i]);
+            }
+            if(arr1[i]!==arr2[i]){
+                return false;
+            }
+        }
+        return true;
+    }
+    return false;
 }
 
 
@@ -105,7 +128,8 @@ function deepEqualArrays(arr1, arr2) {
 // head --> 9 --> 3 --> -1 --> null
 // Las dos clases principales ya van a estar implementadas a continuacion:
 function OrderedLinkedList() {
-    this.head = null;
+    this.head   = null;
+   // this._length = 0
 }
 // notar que Node esta implementado en el archivo DS
 
@@ -139,7 +163,28 @@ OrderedLinkedList.prototype.print = function(){
 // < 'head --> 5 --> 3 --> 1 --> null'
 //               4
 OrderedLinkedList.prototype.add = function(val){
-    
+  var node = new Node(val);
+  current = this.head;
+
+  if(!current){
+    this.head = node;
+   // this._length++;
+    return node;
+  }
+
+  if(val>this.head){
+    node.next=this.head;
+    this.head=node;
+    return node;
+  }
+
+  while(current>val){
+    current=current.next;
+  }
+  node.next   = current.next;
+  current.next = node;
+
+  return node;   
 }
 
 
@@ -159,7 +204,12 @@ OrderedLinkedList.prototype.add = function(val){
 // < null
 
 OrderedLinkedList.prototype.removeHigher = function(){
-    
+    let current = this.head;
+    if(!current){
+        return null;
+    }
+    this.head   = current.next;
+    return current.value;
 }
 
 
@@ -179,7 +229,27 @@ OrderedLinkedList.prototype.removeHigher = function(){
 // < null
 
 OrderedLinkedList.prototype.removeLower = function(){
-    
+    let current = this.head;
+
+  if(current == null){      //Si la lista esta vacia
+    return null;
+  }
+
+  if(!this.head.next){
+      let removed = this.head;
+      this.head = null;
+      return removed.value;
+  }
+
+
+  while(current.next.next){      //Si la lista tiene mas de 1 elemento
+    current = current.next;
+  }
+  
+  let removed = current.next
+  current.next = null;
+  return removed.value;
+
 }
 
 
@@ -212,7 +282,21 @@ OrderedLinkedList.prototype.removeLower = function(){
 // < ["2-1", "1-1", "1-2", "2-2"];
 
 function multiCallbacks(cbs1, cbs2){
-    
+    let nuevoArray = []
+    let resultado = []
+    nuevoArray = cbs1.concat(cbs2);
+    let aux;
+  for(var i=0;i<nuevoArray.length;i++){
+    aux = nuevoArray[i];
+    for(var j=i-1;j>=0 && nuevoArray[j].time>aux.time;j--){
+      nuevoArray[j+1] = nuevoArray[j];
+    }
+    nuevoArray[j+1] = aux;
+  }
+  for(let k=0;k<nuevoArray.length;k++){
+      resultado.push(nuevoArray[k].cb())
+  }
+  return resultado;
 }
 
 
@@ -231,7 +315,16 @@ function multiCallbacks(cbs1, cbs2){
 // resultado:[5,8,9,32,64]
 
 BinarySearchTree.prototype.toArray = function() {
-    
+    let arr = [];
+    if(this.left){
+        this.left.toArray().map(function(e){arr.push(e)});
+    }
+    arr.push(this.value);
+    if(this.right){
+        this.right.toArray().map(function(e){arr.push(e)});
+    }
+
+    return arr;
 }
 
 
@@ -250,7 +343,14 @@ BinarySearchTree.prototype.toArray = function() {
 // informarse sobre algoritmos, leerlos de un pseudocodigo e implemnterlos alcanzara
 
 function primalityTest(n) {
-    
+    if(n<2) return false;
+    for(let i = 2; i <= Math.sqrt(n) ;i++){
+        if (n % i === 0){
+            return false;
+        }
+    }
+
+    return true;    
 }
 
 
@@ -260,7 +360,22 @@ function primalityTest(n) {
 // https://en.wikipedia.org/wiki/Quicksort
 
 function quickSort(array) {
+    if(array.length <1){   //Caso de corte
+        return [];
+      }
     
+      let pivot = array[0];  //Math.floor(Math.random() * array.length);
+      let left = [];
+      let right = [];
+      
+      for(let i = 1 ; i < array.length ; i++){
+        if(array[i]<pivot){
+          right.push(array[i]);
+        }else{
+          left.push(array[i]);
+        }
+      }
+      return [].concat(quickSort(left), pivot , quickSort(right));  
 }
 // QuickSort ya lo conocen solo que este 
 // ordena de mayor a menor
